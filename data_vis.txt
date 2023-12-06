@@ -1,0 +1,59 @@
+B4) data visulization 
+
+ import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import load_iris
+
+# Load the Iris dataset
+iris = load_iris()
+iris_df = pd.DataFrame(data=np.c_[iris['data'], iris['target']], columns=iris['feature_names'] + ['target'])
+iris_df['species'] = iris_df['target'].map({0: 'setosa', 1: 'versicolor', 2: 'virginica'})
+
+# Display the first few rows of the dataset
+print(iris_df.head())
+
+# Pairplot for initial data visualization
+sns.pairplot(iris_df, hue='species', markers=['o', 's', 'D'])
+plt.title('Pairplot of Iris Dataset')
+plt.show()
+
+# Calculate and visualize the correlation matrix
+correlation_matrix = iris_df.corr()
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
+plt.title('Correlation Matrix')
+plt.show()
+
+# Separating features and target variable
+X = iris_df.drop(['target', 'species'], axis=1)
+y = iris_df['target']
+
+# Standardize the features (rescaling)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Apply PCA for feature extraction
+pca = PCA()
+X_pca = pca.fit_transform(X_scaled)
+
+# Explained variance ratio
+explained_variance_ratio = pca.explained_variance_ratio_
+cumulative_variance_ratio = np.cumsum(explained_variance_ratio)
+
+# Scree plot for PCA
+plt.plot(range(1, len(explained_variance_ratio) + 1), cumulative_variance_ratio, marker='o')
+plt.title('Scree Plot for PCA')
+plt.xlabel('Number of Principal Components')
+plt.ylabel('Cumulative Variance Ratio')
+plt.show()
+
+# Visualize the data after PCA (2 principal components)
+pca_df = pd.DataFrame(data=X_pca[:, :2], columns=['Principal Component 1', 'Principal Component 2'])
+pca_df['target'] = y
+
+sns.scatterplot(x='Principal Component 1', y='Principal Component 2', hue='target', data=pca_df, palette='viridis')
+plt.title('Data after PCA (2 Principal Components)')
+plt.show()

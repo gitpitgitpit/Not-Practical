@@ -1,0 +1,36 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Generate a random dataset
+np.random.seed(42)
+data_x = np.random.normal(loc=10, scale=2, size=100)  # Mean=10, Standard Deviation=2
+data_y = 2 * data_x + np.random.normal(loc=0, scale=5, size=100)  # Linear relationship
+
+# Compute statistical measures
+mean_x = np.mean(data_x)
+variance_x = np.var(data_x)
+std_dev_x = np.std(data_x)
+covariance_xy = np.cov(data_x, data_y, ddof=0)[0, 1]  # ddof=0 for population covariance
+correlation_xy = np.corrcoef(data_x, data_y)[0, 1]
+standard_error_x = std_dev_x / np.sqrt(len(data_x))
+
+# Display statistical measures
+print(f"Mean of X: {mean_x}")
+print(f"Variance of X: {variance_x}")
+print(f"Standard Deviation of X: {std_dev_x}")
+print(f"Covariance between X and Y: {covariance_xy}")
+print(f"Correlation between X and Y: {correlation_xy}")
+print(f"Standard Error of X: {standard_error_x}")
+
+# Display the distribution graphically
+plt.figure(figsize=(12, 6))
+
+plt.subplot(1, 2, 1)
+plt.hist(data_x, bins=20, color='blue', alpha=0.7)
+plt.title('Histogram of X')
+
+plt.subplot(1, 2, 2)
+plt.scatter(data_x, data_y, color='red', alpha=0.7)
+plt.title('Scatter Plot of X and Y')
+
+plt.show()

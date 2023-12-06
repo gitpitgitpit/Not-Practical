@@ -1,0 +1,117 @@
+B3) PCA
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import load_iris
+
+# Load the Iris dataset
+iris = load_iris()
+iris_df = pd.DataFrame(data=np.c_[iris['data'], iris['target']], columns=iris['feature_names'] + ['target'])
+iris_df['species'] = iris_df['target'].map({0: 'setosa', 1: 'versicolor', 2: 'virginica'})
+
+# Display the first few rows of the dataset
+print(iris_df.head())
+
+# Calculate and visualize the correlation matrix
+correlation_matrix = iris_df.corr()
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
+plt.title('Correlation Matrix')
+plt.show()
+
+# Separating features and target variable
+X = iris_df.drop(['target', 'species'], axis=1)
+y = iris_df['target']
+
+# Standardize the features (rescaling)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Apply PCA for dimensionality reduction
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+# Create a DataFrame with the principal components and target variable
+pca_df = pd.DataFrame(data=X_pca, columns=['Principal Component 1', 'Principal Component 2'])
+pca_df['target'] = y
+
+# Visualize the data after PCA
+sns.scatterplot(x='Principal Component 1', y='Principal Component 2', hue='target', data=pca_df, palette='viridis')
+plt.title('Data after PCA')
+plt.show()
+
+# Explained variance ratio
+explained_variance_ratio = pca.explained_variance_ratio_
+print("Explained Variance Ratio:", explained_variance_ratio)
+
+
+
+=================oooooooooorrrrrrrrrrrrrr====================================================
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+# Load Iris dataset
+iris = load_iris()
+iris_data = pd.DataFrame(data=np.c_[iris['data'], iris['target']], columns=iris['feature_names'] + ['target'])
+
+# Display the correlation matrix
+correlation_matrix = iris_data.corr()
+print("Correlation Matrix:")
+print(correlation_matrix)
+
+# Plot the correlation matrix
+plt.figure(figsize=(8, 6))
+plt.imshow(correlation_matrix, cmap='coolwarm', interpolation='none')
+plt.colorbar()
+plt.xticks(range(len(correlation_matrix)), correlation_matrix.columns, rotation=90)
+plt.yticks(range(len(correlation_matrix)), correlation_matrix.columns)
+plt.title('Correlation Matrix')
+plt.show()
+
+# Rescale the data using StandardScaler
+features = iris['feature_names']
+X = iris_data[features]
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Apply PCA for dimensionality reduction
+pca = PCA()
+X_pca = pca.fit_transform(X_scaled)
+
+# Plot explained variance ratio
+explained_variance_ratio = pca.explained_variance_ratio_
+cumulative_explained_variance = np.cumsum(explained_variance_ratio)
+
+plt.figure(figsize=(10, 6))
+plt.plot(range(1, len(explained_variance_ratio) + 1), cumulative_explained_variance, marker='o', linestyle='--')
+plt.title('Explained Variance Ratio and Cumulative Explained Variance')
+plt.xlabel('Number of Principal Components')
+plt.ylabel('Cumulative Explained Variance')
+plt.grid(True)
+plt.show()
+
+# Select the number of components for a certain explained variance threshold
+explained_variance_threshold = 0.95
+num_components = np.argmax(cumulative_explained_variance >= explained_variance_threshold) + 1
+
+print(f"Number of components for {explained_variance_threshold * 100}% explained variance: {num_components}")
+
+# Perform PCA with the selected number of components
+pca = PCA(n_components=num_components)
+X_pca = pca.fit_transform(X_scaled)
+
+# Visualize the first two principal components
+plt.figure(figsize=(8, 6))
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=iris['target'], cmap='viridis', edgecolors='k', alpha=0.8)
+plt.title('PCA: First Two Principal Components')
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.show()
